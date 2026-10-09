@@ -35,7 +35,8 @@
       return <i data-lucide={name} className={className} {...props}></i>;
     };
 
-    const STORE_PHONE = "919000000000"; // Replace with Huma Traders WhatsApp Number
+    // Store WhatsApp Number
+    const STORE_PHONE = "918999434173"; 
 
     const CATEGORIES_DATA = [
       { id: 'atta-flour', name: 'Atta & Flour', icon: '🌾' },
@@ -98,19 +99,17 @@
       const [cart, setCart] = useState([]);
       const [wishlist, setWishlist] = useState([]);
       const [searchQuery, setSearchQuery] = useState('');
-      const [selectedCategory, setSelectedCategory] = useState('all');
+      const [isParchiOpen, setIsParchiOpen] = useState(false);
+      const [parchiText, setParchiText] = useState('');
       
-      // Order Management State
-      const [orders, setOrders] = useState([
-        {
-          id: 'HT-8821',
-          date: 'Today, 2:30 PM',
-          status: 'Out for Delivery',
-          total: 454,
-          items: [{ name: 'Aashirvaad Chakki Atta (10 KG)', qty: 1, price: 319 }, { name: 'Toor Dal (1 KG)', qty: 1, price: 135 }],
-          address: 'Main Road, Solapur'
-        }
-      ]);
+      const [orders, setOrders] = useState(() => {
+        const saved = localStorage.getItem('huma_customer_orders');
+        return saved ? JSON.parse(saved) : [];
+      });
+
+      useEffect(() => {
+        localStorage.setItem('huma_customer_orders', JSON.stringify(orders));
+      }, [orders]);
 
       const navigateTo = (route) => {
         setCurrentRoute(route);
@@ -150,6 +149,38 @@
         setWishlist(prev => prev.includes(productId) ? prev.filter(id => id !== productId) : [...prev, productId]);
       };
 
+      const processParchiOrder = (details) => {
+        if (!parchiText.trim()) return;
+
+        const newOrderId = 'HT-' + Math.floor(1000 + Math.random() * 9000);
+        const newOrder = {
+          id: newOrderId,
+          date: 'Just Now',
+          status: 'Parchi Order Placed',
+          total: 'Manual Quote',
+          parchiDetails: parchiText,
+          items: [{ name: 'Custom Ration Parchi List', qty: 1, price: 'Mandi Rate' }],
+          address: details.address,
+          payment: details.paymentMethod
+        };
+
+        setOrders([newOrder, ...orders]);
+
+        let message = `*NEW RATION PARCHI ORDER - HUMA TRADERS*\n`;
+        message += `*Order ID:* ${newOrderId}\n`;
+        message += `*Customer:* ${details.name} (${details.phone})\n`;
+        message += `*Delivery Address:* ${details.address}\n\n`;
+        message += `*RATION PARCHI LIST:* \n${parchiText}\n\n`;
+        message += `Please calculate total mandi price and confirm delivery time!`;
+
+        setIsParchiOpen(false);
+        setParchiText('');
+
+        const encodedMsg = encodeURIComponent(message);
+        window.open(`https://wa.me/${STORE_PHONE}?text=${encodedMsg}`, '_blank');
+        navigateTo('orders');
+      };
+
       const placeOrder = (customerDetails) => {
         if (cart.length === 0) return;
 
@@ -174,13 +205,12 @@
 
         setOrders([newOrder, ...orders]);
 
-        // Construct WhatsApp Message Text
         let message = `*NEW ORDER - HUMA TRADERS SOLAPUR*\n`;
         message += `*Order ID:* ${newOrderId}\n`;
         message += `*Customer:* ${customerDetails.name} (${customerDetails.phone})\n`;
         message += `*Delivery Address:* ${customerDetails.address}\n`;
-        message += `*Payment:* ${customerDetails.paymentMethod}\n\n`;
-        message += `*ITEMS ORDERED:*\n`;
+        message += `*Payment Method:* ${customerDetails.paymentMethod}\n\n`;
+        message += `*ORDER ITEMS:*\n`;
         
         cart.forEach((item, index) => {
           message += `${index + 1}. ${item.name} (${item.isLoose ? item.selectedLooseQty + ' KG' : item.unit}) x ${item.quantity} = ₹${item.effectivePrice * item.quantity}\n`;
@@ -188,15 +218,12 @@
 
         message += `\n*Delivery Charge:* ₹${deliveryCharge}`;
         message += `\n*TOTAL AMOUNT:* ₹${grandTotal}\n\n`;
-        message += `Please confirm my order delivery!`;
+        message += `Please confirm delivery!`;
 
-        // Clear Cart
         setCart([]);
 
-        // Open WhatsApp
         const encodedMsg = encodeURIComponent(message);
         window.open(`https://wa.me/${STORE_PHONE}?text=${encodedMsg}`, '_blank');
-
         navigateTo('orders');
       };
 
@@ -207,8 +234,8 @@
       const value = {
         currentRoute, navigateTo, cart, addToCart, updateCartQty,
         wishlist, toggleWishlist, searchQuery, setSearchQuery,
-        selectedCategory, setSelectedCategory,
-        orders, placeOrder, cartSubtotal, deliveryCharge, grandTotal
+        orders, placeOrder, cartSubtotal, deliveryCharge, grandTotal,
+        isParchiOpen, setIsParchiOpen, parchiText, setParchiText, processParchiOrder
       };
 
       return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
@@ -217,7 +244,7 @@
     const useApp = () => useContext(AppContext);
 
     const Header = () => {
-      const { cart, navigateTo, searchQuery, setSearchQuery } = useApp();
+      const { cart, navigateTo, searchQuery, setSearchQuery, setIsParchiOpen } = useApp();
       const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
       return (
@@ -235,7 +262,11 @@
               </div>
 
               <div className="flex items-center gap-1.5">
-                <button onClick={() => navigateTo('orders')} className="p-2 text-slate-700 bg-slate-100 rounded-xl relative" title="Order Tracking">
+                <button onClick={() => setIsParchiOpen(true)} className="p-2 text-amber-900 bg-amber-50 border border-amber-200 rounded-xl relative flex items-center gap-1 text-[11px] font-bold">
+                  <Icon name="file-text" className="w-4 h-4 text-amber-700" />
+                  <span>Parchi</span>
+                </button>
+                <button onClick={() => navigateTo('orders')} className="p-2 text-slate-700 bg-slate-100 rounded-xl relative" title="Orders">
                   <Icon name="package" className="w-5 h-5 text-emerald-800" />
                 </button>
                 <button onClick={() => navigateTo('cart')} className="p-2 text-slate-700 bg-emerald-50 rounded-xl relative">
@@ -261,6 +292,73 @@
             </div>
           </div>
         </header>
+      );
+    };
+
+    const ParchiModal = () => {
+      const { isParchiOpen, setIsParchiOpen, parchiText, setParchiText, processParchiOrder } = useApp();
+      const [name, setName] = useState('');
+      const [phone, setPhone] = useState('');
+      const [address, setAddress] = useState('');
+
+      if (!isParchiOpen) return null;
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        processParchiOrder({ name, phone, address, paymentMethod: 'Manual Mandi Quote' });
+      };
+
+      return (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-5 max-w-sm w-full space-y-3 shadow-2xl">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-2">
+              <h3 className="text-xs font-black text-slate-900 uppercase flex items-center gap-1.5">
+                <Icon name="file-text" className="w-4 h-4 text-amber-700" /> Haath Se Likhi Ration Parchi Upload
+              </h3>
+              <button onClick={() => setIsParchiOpen(false)}><Icon name="x" className="w-5 h-5 text-slate-400" /></button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-2.5">
+              <textarea
+                rows={4}
+                value={parchiText}
+                onChange={(e) => setParchiText(e.target.value)}
+                placeholder="List Paste Karein:&#10;1. 10 Kilo Chakki Atta&#10;2. 2 Kilo Toor Dal&#10;3. 1 Litre Ghee"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-medium focus:bg-white outline-none"
+                required
+              />
+
+              <input
+                type="text"
+                placeholder="Full Name *"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs outline-none"
+                required
+              />
+              <input
+                type="tel"
+                placeholder="WhatsApp Mobile Number *"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs outline-none"
+                required
+              />
+              <textarea
+                rows={2}
+                placeholder="Solapur Delivery Address *"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs outline-none"
+                required
+              />
+
+              <button type="submit" className="w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-xl flex items-center justify-center gap-1.5">
+                <Icon name="send" className="w-4 h-4" /> Send Parchi to Dukan WhatsApp
+              </button>
+            </form>
+          </div>
+        </div>
       );
     };
 
@@ -319,7 +417,7 @@
     };
 
     const HomePage = () => {
-      const { navigateTo } = useApp();
+      const { navigateTo, setIsParchiOpen } = useApp();
 
       return (
         <div className="space-y-4 pb-20">
@@ -329,6 +427,16 @@
             <p className="text-xs text-emerald-100 mt-1">Wholesale Mandi Rates Guaranteed in Solapur City!</p>
             <button onClick={() => navigateTo('shop')} className="mt-3 bg-white text-emerald-900 text-xs font-black px-4 py-2 rounded-xl shadow-xs">
               Explore Store →
+            </button>
+          </div>
+
+          <div className="bg-amber-50 border border-amber-200 p-3 rounded-2xl flex items-center justify-between">
+            <div>
+              <h3 className="text-xs font-black text-amber-950">Haath Se Likhi Ration Parchi Upload Karo</h3>
+              <p className="text-[10px] font-medium text-amber-800">Directly paste your list & send to WhatsApp</p>
+            </div>
+            <button onClick={() => setIsParchiOpen(true)} className="bg-amber-700 hover:bg-amber-800 text-white text-xs font-bold px-3 py-1.5 rounded-xl shrink-0">
+              Upload List
             </button>
           </div>
 
@@ -402,7 +510,6 @@
                 ))}
               </div>
 
-              {/* Delivery Details Form */}
               <form onSubmit={handleCheckout} className="bg-white p-4 rounded-2xl border border-slate-200 space-y-3 shadow-2xs">
                 <h3 className="text-xs font-black text-slate-900 uppercase">Delivery Address & Checkout</h3>
                 
@@ -495,17 +602,24 @@
                     </span>
                   </div>
 
-                  <div className="space-y-1 text-xs">
-                    {order.items.map((it, idx) => (
-                      <div key={idx} className="flex justify-between text-slate-700">
-                        <span>{it.name} x {it.qty}</span>
-                        <span className="font-bold">₹{it.price}</span>
-                      </div>
-                    ))}
-                  </div>
+                  {order.parchiDetails ? (
+                    <div className="bg-amber-50 p-2.5 rounded-xl border border-amber-100 text-xs">
+                      <p className="font-bold text-amber-950 text-[10px] uppercase">Ration List Parchi:</p>
+                      <p className="text-amber-900 font-medium whitespace-pre-line mt-0.5">{order.parchiDetails}</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-1 text-xs">
+                      {order.items.map((it, idx) => (
+                        <div key={idx} className="flex justify-between text-slate-700">
+                          <span>{it.name} x {it.qty}</span>
+                          <span className="font-bold">₹{it.price}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
                   <div className="border-t border-slate-100 pt-2 flex justify-between items-center text-xs">
-                    <span className="text-slate-500">Total: <strong className="text-slate-900">₹{order.total}</strong></span>
+                    <span className="text-slate-500">Total: <strong className="text-slate-900">{typeof order.total === 'number' ? `₹${order.total}` : order.total}</strong></span>
                     <span className="text-[10px] text-emerald-800 font-bold bg-emerald-50 px-2 py-1 rounded-md">Live Solapur Tracking</span>
                   </div>
                 </div>
@@ -517,7 +631,7 @@
     };
 
     const BottomNav = () => {
-      const { currentRoute, navigateTo, cart, orders } = useApp();
+      const { currentRoute, navigateTo, cart } = useApp();
       const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
       return (
@@ -554,6 +668,7 @@
       return (
         <div className="min-h-screen bg-slate-100 max-w-md mx-auto shadow-xl relative">
           <Header />
+          <ParchiModal />
           <main className="px-4 py-3">
             {currentRoute === 'home' && <HomePage />}
             {currentRoute === 'shop' && (
