@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Huma Traders - Online Kirana Store Solapur</title>
     
-    <!-- PWA Web App Manifest -->
-    <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Huma%20Traders%20Store%22%2C%22short_name%22%3A%22HumaTraders%22%2C%22start_url%22%3A%22%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23065f46%22%2C%22theme_color%22%3A%22%23065f46%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F3144%2F3144456.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%22%7D%5D%7D" />
+    <!-- PWA Web App Manifest Link -->
+    <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#065f46" />
     
     <!-- CDNs -->
@@ -70,7 +70,6 @@
 
         return (
           <div className="min-h-screen bg-gray-50 pb-20">
-            {/* Header */}
             <header className="bg-emerald-800 text-white p-4 shadow-md sticky top-0 z-10 flex justify-between items-center">
               <div>
                 <h1 className="text-xl font-bold">🛒 HUMA TRADERS</h1>
@@ -84,13 +83,11 @@
               </button>
             </header>
 
-            {/* Banner */}
             <div className="bg-emerald-100 p-4 text-center border-b">
               <p className="text-emerald-900 font-bold text-sm">🚚 Solapur Me Home Delivery Uplabdh!</p>
               <p className="text-xs text-emerald-700">Mandi Saste Rato Par Grocery Kharidein</p>
             </div>
 
-            {/* Main Products List */}
             <main className="p-4 max-w-lg mx-auto">
               <h2 className="font-bold text-gray-800 mb-3 text-lg">Featured Grocery Items</h2>
 
@@ -119,7 +116,6 @@
               </div>
             </main>
 
-            {/* Cart Modal Slide-over */}
             {showCart && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-end z-20">
                 <div className="bg-white w-full max-w-md h-full p-4 flex flex-col justify-between">
