@@ -1,0 +1,15 @@
+{
+  "name": "Huma Traders Store",
+  "short_name": "Huma Traders",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#065f46",
+  "theme_color": "#065f46",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3144/3144456.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
