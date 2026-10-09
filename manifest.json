@@ -1,7 +1,7 @@
 {
-  "name": "Huma Traders Store",
-  "short_name": "Huma Traders",
-  "description": "Huma Traders Solapur Online Grocery Store",
+  "name": "Huma Customer Store",
+  "short_name": "Huma Customer",
+  "description": "Huma Traders Solapur Online Kirana Customer App",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#065f46",
