@@ -48,7 +48,6 @@
 
     const STORE_PHONE = "918999434173"; 
 
-    // Translations Dictionary
     const TRANSLATIONS = {
       en: {
         storeTitle: "HUMA CUSTOMER",
@@ -65,9 +64,7 @@
         featuredTitle: "Featured Items",
         add: "ADD",
         totalSavings: "Total Savings",
-        checkoutBtn: "Confirm & Place Order via WhatsApp",
-        voiceMicListening: "Listening... Speak your grocery list",
-        reorderBtn: "Re-order Same List"
+        checkoutBtn: "Confirm & Place Order via WhatsApp"
       },
       mr: {
         storeTitle: "हुमा कस्टमर",
@@ -84,9 +81,7 @@
         featuredTitle: "खास वस्तू",
         add: "जोडा",
         totalSavings: "एकूण बचत",
-        checkoutBtn: "व्हॉट्सॲपद्वारे ऑर्डर निश्चित करा",
-        voiceMicListening: "ऐकत आहे... किराणा यादी बोला",
-        reorderBtn: "पुन्हा ऑर्डर करा"
+        checkoutBtn: "व्हॉट्सॲपद्वारे ऑर्डर निश्चित करा"
       },
       hi: {
         storeTitle: "हुमा कस्टमर",
@@ -103,9 +98,7 @@
         featuredTitle: "खास सामान",
         add: "जोड़ें",
         totalSavings: "कुल बचत",
-        checkoutBtn: "व्हाट्सएप द्वारा ऑर्डर कंफर्म करें",
-        voiceMicListening: "सुन रहा हूँ... राशन सूची बोलें",
-        reorderBtn: "दोबारा ऑर्डर करें"
+        checkoutBtn: "व्हाट्सएप द्वारा ऑर्डर कंफर्म करें"
       }
     };
 
@@ -226,7 +219,6 @@
         setWishlist(prev => prev.includes(productId) ? prev.filter(id => id !== productId) : [...prev, productId]);
       };
 
-      // Voice Search Feature
       const startVoiceSearch = (targetField = 'search') => {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
           alert("Aapke browser me voice recognition support nahi hai.");
@@ -377,7 +369,6 @@
               </div>
 
               <div className="flex items-center gap-1.5">
-                <!-- Language Switcher -->
                 <select
                   value={lang}
                   onChange={(e) => setLang(e.target.value)}
@@ -404,7 +395,6 @@
               </div>
             </div>
 
-            <!-- Voice Enabled Search -->
             <div className="mt-2.5 relative flex items-center">
               <input
                 type="text"
@@ -428,7 +418,7 @@
     };
 
     const ParchiModal = () => {
-      const { isParchiOpen, setIsParchiOpen, parchiText, setParchiText, parchiImage, setParchiImage, processParchiOrder, isListening, startVoiceSearch, t } = useApp();
+      const { isParchiOpen, setIsParchiOpen, parchiText, setParchiText, parchiImage, setParchiImage, processParchiOrder, isListening, startVoiceSearch } = useApp();
       const [name, setName] = useState('');
       const [phone, setPhone] = useState('');
       const [address, setAddress] = useState('');
@@ -460,7 +450,6 @@
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-2.5">
-              <!-- Photo Upload & Voice Options -->
               <div className="grid grid-cols-2 gap-2">
                 <div className="border-2 border-dashed border-amber-300 bg-amber-50/50 p-2.5 rounded-xl text-center">
                   {parchiImage ? (
@@ -495,7 +484,7 @@
                 rows={3}
                 value={parchiText}
                 onChange={(e) => setParchiText(e.target.value)}
-                placeholder="1. 10 Kilo Chakki Atta&#10;2. 2 Kilo Toor Dal&#10;3. 1 L Sunflower Oil"
+                placeholder="1. 10 Kilo Chakki Atta&#10;2. 2 Kilo Toor Dal"
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-medium focus:bg-white outline-none"
               />
 
@@ -669,7 +658,6 @@
             </div>
           ) : (
             <div className="space-y-4">
-              <!-- Total Savings Banner -->
               {totalSavings > 0 && (
                 <div className="bg-emerald-800 text-white p-3 rounded-2xl flex items-center justify-between shadow-xs">
                   <div className="flex items-center gap-2">
@@ -770,7 +758,7 @@
     };
 
     const OrdersPage = () => {
-      const { orders, t } = useApp();
+      const { orders } = useApp();
 
       return (
         <div className="space-y-4 pb-20">
@@ -825,7 +813,6 @@
       );
     };
 
-    // Floating Live WhatsApp Support Button
     const FloatingWhatsApp = () => (
       <a
         href={`https://wa.me/${STORE_PHONE}?text=Hello%20Huma%20Traders,%20mujhse%20ration%20related%20help%20chahiye.`}
