@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="mr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -19,6 +19,17 @@
 
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.1); opacity: 0.4; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .mic-active { animation: pulse-ring 1.2s infinite ease-in-out; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
 </head>
 <body class="bg-slate-100 antialiased selection:bg-emerald-200">
   <div id="root"></div>
@@ -35,8 +46,68 @@
       return <i data-lucide={name} className={className} {...props}></i>;
     };
 
-    // Store WhatsApp Number
     const STORE_PHONE = "918999434173"; 
+
+    // Translations Dictionary
+    const TRANSLATIONS = {
+      en: {
+        storeTitle: "HUMA CUSTOMER",
+        storeSub: "Solapur Grocery Store",
+        searchPlaceholder: "Search Atta, Rice, Dal, Oil...",
+        parchiBtn: "Parchi",
+        mandiOfferTag: "Solapur Direct Mandi",
+        heroTitle: "Fresh Grocery Delivered To Your Doorstep",
+        heroSub: "Wholesale Mandi Rates Guaranteed in Solapur City!",
+        parchiBoxTitle: "Haath Se Likhi Ration Parchi Upload Karo",
+        parchiBoxSub: "Photo, Voice ya Text se WhatsApp par bhejein",
+        uploadBtn: "Upload List",
+        categoriesTitle: "Categories",
+        featuredTitle: "Featured Items",
+        add: "ADD",
+        totalSavings: "Total Savings",
+        checkoutBtn: "Confirm & Place Order via WhatsApp",
+        voiceMicListening: "Listening... Speak your grocery list",
+        reorderBtn: "Re-order Same List"
+      },
+      mr: {
+        storeTitle: "हुमा कस्टमर",
+        storeSub: "सोलापूर किराणा स्टोअर",
+        searchPlaceholder: "शोधा पीठ, तांदूळ, डाळ, तेल...",
+        parchiBtn: "पावती",
+        mandiOfferTag: "सोलापूर थेट मार्केट",
+        heroTitle: "ताजा किराणा थेट तुमच्या दारापर्यंत",
+        heroSub: "सोलापूर शहरात घाऊक बाजार भाव!",
+        parchiBoxTitle: "हाताने लिहिलेली रेशन पावती पाठवा",
+        parchiBoxSub: "फोटो, आवाजाने किंवा लिहून व्हॉट्सॲपवर पाठवा",
+        uploadBtn: "अपलोड करा",
+        categoriesTitle: "वर्गवारी",
+        featuredTitle: "खास वस्तू",
+        add: "जोडा",
+        totalSavings: "एकूण बचत",
+        checkoutBtn: "व्हॉट्सॲपद्वारे ऑर्डर निश्चित करा",
+        voiceMicListening: "ऐकत आहे... किराणा यादी बोला",
+        reorderBtn: "पुन्हा ऑर्डर करा"
+      },
+      hi: {
+        storeTitle: "हुमा कस्टमर",
+        storeSub: "सोलापुर किराना स्टोर",
+        searchPlaceholder: "खोजें आटा, चावल, दाल, तेल...",
+        parchiBtn: "पर्ची",
+        mandiOfferTag: "सोलापुर डायरेक्ट मंडी",
+        heroTitle: "ताज़ा किराना आपके घर तक",
+        heroSub: "सोलापुर शहर में थोक मंडी भाव!",
+        parchiBoxTitle: "हाथ से लिखी राशन पर्ची अपलोड करें",
+        parchiBoxSub: "फोटो, आवाज या लिखकर व्हाट्सएप पर भेजें",
+        uploadBtn: "अपलोड करें",
+        categoriesTitle: "श्रेणियाँ",
+        featuredTitle: "खास सामान",
+        add: "जोड़ें",
+        totalSavings: "कुल बचत",
+        checkoutBtn: "व्हाट्सएप द्वारा ऑर्डर कंफर्म करें",
+        voiceMicListening: "सुन रहा हूँ... राशन सूची बोलें",
+        reorderBtn: "दोबारा ऑर्डर करें"
+      }
+    };
 
     const CATEGORIES_DATA = [
       { id: 'atta-flour', name: 'Atta & Flour', icon: '🌾' },
@@ -96,11 +167,14 @@
 
     const AppProvider = ({ children }) => {
       const [currentRoute, setCurrentRoute] = useState('home');
+      const [lang, setLang] = useState('en');
       const [cart, setCart] = useState([]);
       const [wishlist, setWishlist] = useState([]);
       const [searchQuery, setSearchQuery] = useState('');
       const [isParchiOpen, setIsParchiOpen] = useState(false);
       const [parchiText, setParchiText] = useState('');
+      const [parchiImage, setParchiImage] = useState(null);
+      const [isListening, setIsListening] = useState(false);
       
       const [orders, setOrders] = useState(() => {
         const saved = localStorage.getItem('huma_customer_orders');
@@ -110,6 +184,8 @@
       useEffect(() => {
         localStorage.setItem('huma_customer_orders', JSON.stringify(orders));
       }, [orders]);
+
+      const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
       const navigateTo = (route) => {
         setCurrentRoute(route);
@@ -128,7 +204,8 @@
             ...product,
             quantity: 1,
             selectedLooseQty: product.isLoose ? looseQty : 1,
-            effectivePrice: product.isLoose ? product.price * looseQty : product.price
+            effectivePrice: product.isLoose ? product.price * looseQty : product.price,
+            effectiveMrp: product.isLoose ? product.mrp * looseQty : product.mrp
           }];
         });
       };
@@ -149,8 +226,36 @@
         setWishlist(prev => prev.includes(productId) ? prev.filter(id => id !== productId) : [...prev, productId]);
       };
 
+      // Voice Search Feature
+      const startVoiceSearch = (targetField = 'search') => {
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+          alert("Aapke browser me voice recognition support nahi hai.");
+          return;
+        }
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.lang = lang === 'mr' ? 'mr-IN' : (lang === 'hi' ? 'hi-IN' : 'en-IN');
+        recognition.continuous = false;
+
+        recognition.onstart = () => setIsListening(true);
+        recognition.onend = () => setIsListening(false);
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          if (targetField === 'search') {
+            setSearchQuery(transcript);
+          } else if (targetField === 'parchi') {
+            setParchiText(prev => (prev ? prev + '\n' + transcript : transcript));
+          }
+        };
+
+        recognition.start();
+      };
+
       const processParchiOrder = (details) => {
-        if (!parchiText.trim()) return;
+        if (!parchiText.trim() && !parchiImage) {
+          alert("Kripya ration parchi likhein, bolen ya photo upload karein.");
+          return;
+        }
 
         const newOrderId = 'HT-' + Math.floor(1000 + Math.random() * 9000);
         const newOrder = {
@@ -158,8 +263,8 @@
           date: 'Just Now',
           status: 'Parchi Order Placed',
           total: 'Manual Quote',
-          parchiDetails: parchiText,
-          items: [{ name: 'Custom Ration Parchi List', qty: 1, price: 'Mandi Rate' }],
+          parchiDetails: parchiText || 'Photo Uploaded',
+          items: [{ name: 'Custom Ration Parchi / Image', qty: 1, price: 'Mandi Rate' }],
           address: details.address,
           payment: details.paymentMethod
         };
@@ -170,11 +275,17 @@
         message += `*Order ID:* ${newOrderId}\n`;
         message += `*Customer:* ${details.name} (${details.phone})\n`;
         message += `*Delivery Address:* ${details.address}\n\n`;
-        message += `*RATION PARCHI LIST:* \n${parchiText}\n\n`;
-        message += `Please calculate total mandi price and confirm delivery time!`;
+        if (parchiText) {
+          message += `*RATION PARCHI LIST:* \n${parchiText}\n\n`;
+        }
+        if (parchiImage) {
+          message += `📸 *Note:* Maine parchi ki photo attached kar di hai. Please check karein!\n\n`;
+        }
+        message += `Please confirm total mandi price and delivery!`;
 
         setIsParchiOpen(false);
         setParchiText('');
+        setParchiImage(null);
 
         const encodedMsg = encodeURIComponent(message);
         window.open(`https://wa.me/${STORE_PHONE}?text=${encodedMsg}`, '_blank');
@@ -228,14 +339,18 @@
       };
 
       const cartSubtotal = useMemo(() => cart.reduce((acc, item) => acc + (item.effectivePrice * item.quantity), 0), [cart]);
+      const cartTotalMrp = useMemo(() => cart.reduce((acc, item) => acc + ((item.effectiveMrp || item.mrp) * item.quantity), 0), [cart]);
+      const totalSavings = Math.max(0, cartTotalMrp - cartSubtotal);
+      
       const deliveryCharge = cartSubtotal >= 499 || cartSubtotal === 0 ? 0 : 30;
       const grandTotal = cartSubtotal + deliveryCharge;
 
       const value = {
-        currentRoute, navigateTo, cart, addToCart, updateCartQty,
+        currentRoute, navigateTo, lang, setLang, t, cart, addToCart, updateCartQty,
         wishlist, toggleWishlist, searchQuery, setSearchQuery,
-        orders, placeOrder, cartSubtotal, deliveryCharge, grandTotal,
-        isParchiOpen, setIsParchiOpen, parchiText, setParchiText, processParchiOrder
+        orders, placeOrder, cartSubtotal, cartTotalMrp, totalSavings, deliveryCharge, grandTotal,
+        isParchiOpen, setIsParchiOpen, parchiText, setParchiText, parchiImage, setParchiImage, processParchiOrder,
+        isListening, startVoiceSearch
       };
 
       return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
@@ -244,31 +359,40 @@
     const useApp = () => useContext(AppContext);
 
     const Header = () => {
-      const { cart, navigateTo, searchQuery, setSearchQuery, setIsParchiOpen } = useApp();
+      const { cart, navigateTo, searchQuery, setSearchQuery, setIsParchiOpen, lang, setLang, t, isListening, startVoiceSearch } = useApp();
       const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
       return (
         <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs">
           <div className="max-w-md mx-auto px-4 py-3">
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center justify-between gap-2">
               <div onClick={() => navigateTo('home')} className="flex items-center gap-2 cursor-pointer">
                 <div className="w-9 h-9 rounded-xl bg-emerald-800 text-white flex items-center justify-center font-black text-lg shadow-xs">
                   H
                 </div>
                 <div>
-                  <h1 className="text-sm font-black text-emerald-950 tracking-tight leading-none">HUMA CUSTOMER</h1>
-                  <p className="text-[10px] font-bold text-slate-500">Solapur Grocery Store</p>
+                  <h1 className="text-xs font-black text-emerald-950 tracking-tight leading-none">{t.storeTitle}</h1>
+                  <p className="text-[10px] font-bold text-slate-500">{t.storeSub}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-1.5">
-                <button onClick={() => setIsParchiOpen(true)} className="p-2 text-amber-900 bg-amber-50 border border-amber-200 rounded-xl relative flex items-center gap-1 text-[11px] font-bold">
+                <!-- Language Switcher -->
+                <select
+                  value={lang}
+                  onChange={(e) => setLang(e.target.value)}
+                  className="text-[10px] font-extrabold bg-slate-100 border border-slate-200 text-slate-700 py-1.5 px-1.5 rounded-xl outline-none"
+                >
+                  <option value="en">EN</option>
+                  <option value="mr">मराठी</option>
+                  <option value="hi">हिंदी</option>
+                </select>
+
+                <button onClick={() => setIsParchiOpen(true)} className="p-1.5 text-amber-900 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-1 text-[11px] font-bold">
                   <Icon name="file-text" className="w-4 h-4 text-amber-700" />
-                  <span>Parchi</span>
+                  <span>{t.parchiBtn}</span>
                 </button>
-                <button onClick={() => navigateTo('orders')} className="p-2 text-slate-700 bg-slate-100 rounded-xl relative" title="Orders">
-                  <Icon name="package" className="w-5 h-5 text-emerald-800" />
-                </button>
+
                 <button onClick={() => navigateTo('cart')} className="p-2 text-slate-700 bg-emerald-50 rounded-xl relative">
                   <Icon name="shopping-bag" className="w-5 h-5 text-emerald-800" />
                   {cartCount > 0 && (
@@ -280,15 +404,23 @@
               </div>
             </div>
 
+            <!-- Voice Enabled Search -->
             <div className="mt-2.5 relative flex items-center">
               <input
                 type="text"
-                placeholder="Search Atta, Rice, Dal, Oil..."
+                placeholder={t.searchPlaceholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-slate-100 border-none rounded-xl py-2 pl-9 pr-4 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-emerald-800 focus:bg-white transition-all outline-none"
+                className="w-full bg-slate-100 border-none rounded-xl py-2 pl-9 pr-9 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-emerald-800 focus:bg-white transition-all outline-none"
               />
               <Icon name="search" className="w-4 h-4 text-slate-400 absolute left-3" />
+              <button
+                onClick={() => startVoiceSearch('search')}
+                title="Voice Search"
+                className={`absolute right-2.5 p-1 rounded-lg ${isListening ? 'bg-rose-500 text-white mic-active' : 'text-emerald-800 bg-emerald-100'}`}
+              >
+                <Icon name="mic" className="w-3.5 h-3.5" />
+              </button>
             </div>
           </div>
         </header>
@@ -296,12 +428,21 @@
     };
 
     const ParchiModal = () => {
-      const { isParchiOpen, setIsParchiOpen, parchiText, setParchiText, processParchiOrder } = useApp();
+      const { isParchiOpen, setIsParchiOpen, parchiText, setParchiText, parchiImage, setParchiImage, processParchiOrder, isListening, startVoiceSearch, t } = useApp();
       const [name, setName] = useState('');
       const [phone, setPhone] = useState('');
       const [address, setAddress] = useState('');
 
       if (!isParchiOpen) return null;
+
+      const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onloadend = () => setParchiImage(reader.result);
+          reader.readAsDataURL(file);
+        }
+      };
 
       const handleSubmit = (e) => {
         e.preventDefault();
@@ -310,22 +451,52 @@
 
       return (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-5 max-w-sm w-full space-y-3 shadow-2xl">
+          <div className="bg-white rounded-2xl p-5 max-w-sm w-full space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b border-slate-100 pb-2">
               <h3 className="text-xs font-black text-slate-900 uppercase flex items-center gap-1.5">
-                <Icon name="file-text" className="w-4 h-4 text-amber-700" /> Haath Se Likhi Ration Parchi Upload
+                <Icon name="file-text" className="w-4 h-4 text-amber-700" /> Ration Parchi Upload / Voice
               </h3>
               <button onClick={() => setIsParchiOpen(false)}><Icon name="x" className="w-5 h-5 text-slate-400" /></button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-2.5">
+              <!-- Photo Upload & Voice Options -->
+              <div className="grid grid-cols-2 gap-2">
+                <div className="border-2 border-dashed border-amber-300 bg-amber-50/50 p-2.5 rounded-xl text-center">
+                  {parchiImage ? (
+                    <div className="relative">
+                      <img src={parchiImage} alt="Parchi Preview" className="h-16 mx-auto rounded object-contain" />
+                      <button type="button" onClick={() => setParchiImage(null)} className="absolute -top-2 -right-2 bg-rose-600 text-white rounded-full p-1 shadow-md">
+                        <Icon name="x" className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="cursor-pointer flex flex-col items-center justify-center space-y-1">
+                      <Icon name="camera" className="w-5 h-5 text-amber-700" />
+                      <span className="text-[10px] font-bold text-amber-900">Photo Upload</span>
+                      <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                    </label>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => startVoiceSearch('parchi')}
+                  className={`border-2 border-dashed ${isListening ? 'border-rose-500 bg-rose-50 mic-active' : 'border-emerald-300 bg-emerald-50'} p-2.5 rounded-xl flex flex-col items-center justify-center space-y-1`}
+                >
+                  <Icon name="mic" className={`w-5 h-5 ${isListening ? 'text-rose-600' : 'text-emerald-800'}`} />
+                  <span className="text-[10px] font-bold text-slate-800">{isListening ? 'Listening...' : 'Bol Kar Likho'}</span>
+                </button>
+              </div>
+
+              <div className="text-center text-[9px] font-bold text-slate-400 uppercase">YA TEXT LIST DALEIN</div>
+
               <textarea
-                rows={4}
+                rows={3}
                 value={parchiText}
                 onChange={(e) => setParchiText(e.target.value)}
-                placeholder="List Paste Karein:&#10;1. 10 Kilo Chakki Atta&#10;2. 2 Kilo Toor Dal&#10;3. 1 Litre Ghee"
+                placeholder="1. 10 Kilo Chakki Atta&#10;2. 2 Kilo Toor Dal&#10;3. 1 L Sunflower Oil"
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-medium focus:bg-white outline-none"
-                required
               />
 
               <input
@@ -353,7 +524,7 @@
                 required
               />
 
-              <button type="submit" className="w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-xl flex items-center justify-center gap-1.5">
+              <button type="submit" className="w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-md">
                 <Icon name="send" className="w-4 h-4" /> Send Parchi to Dukan WhatsApp
               </button>
             </form>
@@ -363,12 +534,13 @@
     };
 
     const ProductCard = ({ product }) => {
-      const { addToCart, wishlist, toggleWishlist, cart } = useApp();
+      const { addToCart, wishlist, toggleWishlist, cart, t } = useApp();
       const [selectedLooseQty, setSelectedLooseQty] = useState(1);
       const isWishlisted = wishlist.includes(product.id);
       const cartItem = cart.find(item => item.id === product.id && (!product.isLoose || item.selectedLooseQty === selectedLooseQty));
 
       const calculatedPrice = product.isLoose ? product.price * selectedLooseQty : product.price;
+      const calculatedMrp = product.isLoose ? product.mrp * selectedLooseQty : product.mrp;
 
       return (
         <div className="bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-2xs flex flex-col justify-between relative">
@@ -376,8 +548,11 @@
             <Icon name="heart" className={`w-3.5 h-3.5 ${isWishlisted ? 'fill-rose-500 text-rose-500' : 'text-slate-400'}`} />
           </button>
 
-          <div className="aspect-square w-full bg-slate-50 overflow-hidden">
+          <div className="aspect-square w-full bg-slate-50 overflow-hidden relative">
             <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+            <span className="absolute bottom-2 left-2 bg-rose-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded">
+              Save ₹{calculatedMrp - calculatedPrice}
+            </span>
           </div>
 
           <div className="p-3 flex-1 flex flex-col justify-between space-y-2">
@@ -404,11 +579,11 @@
             <div className="flex items-center justify-between pt-1 border-t border-slate-100">
               <div>
                 <span className="text-sm font-black text-slate-900">₹{calculatedPrice}</span>
-                <span className="text-[10px] text-slate-400 line-through ml-1">₹{product.mrp}</span>
+                <span className="text-[10px] text-slate-400 line-through ml-1">₹{calculatedMrp}</span>
               </div>
               <button onClick={() => addToCart(product, selectedLooseQty)} className="px-3 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold rounded-xl shadow-xs active:scale-95 transition-transform flex items-center gap-1">
                 <Icon name="plus" className="w-3 h-3" />
-                <span>{cartItem ? `(${cartItem.quantity})` : 'ADD'}</span>
+                <span>{cartItem ? `(${cartItem.quantity})` : t.add}</span>
               </button>
             </div>
           </div>
@@ -417,31 +592,36 @@
     };
 
     const HomePage = () => {
-      const { navigateTo, setIsParchiOpen } = useApp();
+      const { navigateTo, setIsParchiOpen, t, searchQuery } = useApp();
+
+      const filteredProducts = useMemo(() => {
+        if (!searchQuery.trim()) return MOCK_PRODUCTS;
+        return MOCK_PRODUCTS.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.brand.toLowerCase().includes(searchQuery.toLowerCase()));
+      }, [searchQuery]);
 
       return (
         <div className="space-y-4 pb-20">
           <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-emerald-900 to-emerald-800 text-white p-5 shadow-md">
-            <span className="bg-amber-400 text-slate-950 font-black text-[9px] px-2.5 py-1 rounded-full uppercase tracking-wider">Solapur Direct Mandi</span>
-            <h2 className="text-lg font-black leading-tight mt-2">Fresh Grocery Delivered To Your Doorstep</h2>
-            <p className="text-xs text-emerald-100 mt-1">Wholesale Mandi Rates Guaranteed in Solapur City!</p>
+            <span className="bg-amber-400 text-slate-950 font-black text-[9px] px-2.5 py-1 rounded-full uppercase tracking-wider">{t.mandiOfferTag}</span>
+            <h2 className="text-lg font-black leading-tight mt-2">{t.heroTitle}</h2>
+            <p className="text-xs text-emerald-100 mt-1">{t.heroSub}</p>
             <button onClick={() => navigateTo('shop')} className="mt-3 bg-white text-emerald-900 text-xs font-black px-4 py-2 rounded-xl shadow-xs">
               Explore Store →
             </button>
           </div>
 
-          <div className="bg-amber-50 border border-amber-200 p-3 rounded-2xl flex items-center justify-between">
+          <div className="bg-amber-50 border border-amber-200 p-3 rounded-2xl flex items-center justify-between shadow-2xs">
             <div>
-              <h3 className="text-xs font-black text-amber-950">Haath Se Likhi Ration Parchi Upload Karo</h3>
-              <p className="text-[10px] font-medium text-amber-800">Directly paste your list & send to WhatsApp</p>
+              <h3 className="text-xs font-black text-amber-950">{t.parchiBoxTitle}</h3>
+              <p className="text-[10px] font-medium text-amber-800">{t.parchiBoxSub}</p>
             </div>
             <button onClick={() => setIsParchiOpen(true)} className="bg-amber-700 hover:bg-amber-800 text-white text-xs font-bold px-3 py-1.5 rounded-xl shrink-0">
-              Upload List
+              {t.uploadBtn}
             </button>
           </div>
 
           <section className="space-y-2">
-            <h2 className="text-xs font-black text-slate-900 uppercase tracking-wider">Categories</h2>
+            <h2 className="text-xs font-black text-slate-900 uppercase tracking-wider">{t.categoriesTitle}</h2>
             <div className="flex gap-2.5 overflow-x-auto pb-1 no-scrollbar">
               {CATEGORIES_DATA.map(cat => (
                 <div key={cat.id} onClick={() => navigateTo('shop')} className="shrink-0 p-3 w-20 bg-white border border-slate-200 rounded-2xl text-center cursor-pointer shadow-2xs">
@@ -453,9 +633,9 @@
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-xs font-black text-slate-900 uppercase tracking-wider">Featured Items</h2>
+            <h2 className="text-xs font-black text-slate-900 uppercase tracking-wider">{t.featuredTitle}</h2>
             <div className="grid grid-cols-2 gap-3">
-              {MOCK_PRODUCTS.map(product => <ProductCard key={product.id} product={product} />)}
+              {filteredProducts.map(product => <ProductCard key={product.id} product={product} />)}
             </div>
           </section>
         </div>
@@ -463,7 +643,7 @@
     };
 
     const CartPage = () => {
-      const { cart, updateCartQty, cartSubtotal, deliveryCharge, grandTotal, placeOrder } = useApp();
+      const { cart, updateCartQty, cartSubtotal, totalSavings, deliveryCharge, grandTotal, placeOrder, t } = useApp();
       const [name, setName] = useState('');
       const [phone, setPhone] = useState('');
       const [address, setAddress] = useState('');
@@ -489,6 +669,19 @@
             </div>
           ) : (
             <div className="space-y-4">
+              <!-- Total Savings Banner -->
+              {totalSavings > 0 && (
+                <div className="bg-emerald-800 text-white p-3 rounded-2xl flex items-center justify-between shadow-xs">
+                  <div className="flex items-center gap-2">
+                    <Icon name="sparkles" className="w-5 h-5 text-amber-300" />
+                    <div>
+                      <p className="text-xs font-extrabold">{t.totalSavings}: ₹{totalSavings}</p>
+                      <p className="text-[9px] text-emerald-200">Wholesale Solapur Mandi Direct Price Saved!</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="bg-white rounded-2xl border border-slate-200 divide-y divide-slate-100 overflow-hidden shadow-2xs">
                 {cart.map((item, idx) => (
                   <div key={idx} className="p-3 flex items-center justify-between gap-3 text-xs">
@@ -567,7 +760,7 @@
 
                 <button type="submit" className="w-full bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold py-3 rounded-xl shadow-md flex items-center justify-center gap-2">
                   <Icon name="send" className="w-4 h-4" />
-                  <span>Confirm & Place Order via WhatsApp</span>
+                  <span>{t.checkoutBtn}</span>
                 </button>
               </form>
             </div>
@@ -577,7 +770,7 @@
     };
 
     const OrdersPage = () => {
-      const { orders } = useApp();
+      const { orders, t } = useApp();
 
       return (
         <div className="space-y-4 pb-20">
@@ -620,7 +813,9 @@
 
                   <div className="border-t border-slate-100 pt-2 flex justify-between items-center text-xs">
                     <span className="text-slate-500">Total: <strong className="text-slate-900">{typeof order.total === 'number' ? `₹${order.total}` : order.total}</strong></span>
-                    <span className="text-[10px] text-emerald-800 font-bold bg-emerald-50 px-2 py-1 rounded-md">Live Solapur Tracking</span>
+                    <button onClick={() => window.open(`https://wa.me/${STORE_PHONE}?text=Query%20regarding%20Order%20${order.id}`, '_blank')} className="text-[10px] text-emerald-800 font-bold bg-emerald-50 px-2 py-1 rounded-md flex items-center gap-1">
+                      <Icon name="message-circle" className="w-3 h-3" /> Track on WhatsApp
+                    </button>
                   </div>
                 </div>
               ))}
@@ -629,6 +824,19 @@
         </div>
       );
     };
+
+    // Floating Live WhatsApp Support Button
+    const FloatingWhatsApp = () => (
+      <a
+        href={`https://wa.me/${STORE_PHONE}?text=Hello%20Huma%20Traders,%20mujhse%20ration%20related%20help%20chahiye.`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-16 right-4 z-40 bg-emerald-600 text-white p-3 rounded-full shadow-2xl flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+        title="Chat with Store"
+      >
+        <Icon name="message-circle" className="w-6 h-6 fill-white text-emerald-600" />
+      </a>
+    );
 
     const BottomNav = () => {
       const { currentRoute, navigateTo, cart } = useApp();
@@ -669,6 +877,7 @@
         <div className="min-h-screen bg-slate-100 max-w-md mx-auto shadow-xl relative">
           <Header />
           <ParchiModal />
+          <FloatingWhatsApp />
           <main className="px-4 py-3">
             {currentRoute === 'home' && <HomePage />}
             {currentRoute === 'shop' && (
