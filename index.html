@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Huma Customer - Solapur Online Kirana</title>
+  <title>Huma Customer - Modern Kirana Store</title>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#065f46">
 
@@ -20,59 +20,30 @@
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="bg-slate-50 antialiased selection:bg-emerald-200">
+<body class="bg-slate-100 antialiased selection:bg-emerald-200">
   <div id="root"></div>
 
   <script type="text/babel">
     const { useState, useEffect, useMemo, createContext, useContext } = React;
 
-    // Lucide Icon Helper Component for Browser CDN
     const Icon = ({ name, className = "w-4 h-4", ...props }) => {
       useEffect(() => {
         if (window.lucide) {
           window.lucide.createIcons();
         }
       }, [name]);
-      return <i data-lucide={name} class={className} {...props}></i>;
+      return <i data-lucide={name} className={className} {...props}></i>;
     };
+
+    const STORE_PHONE = "919000000000"; // Replace with Huma Traders WhatsApp Number
 
     const CATEGORIES_DATA = [
       { id: 'atta-flour', name: 'Atta & Flour', icon: '🌾' },
-      { id: 'rice', name: 'Rice & Products', icon: '🍚' },
+      { id: 'rice', name: 'Rice & Grains', icon: '🍚' },
       { id: 'dal-pulses', name: 'Dal & Pulses', icon: '🫘' },
       { id: 'oil-ghee', name: 'Oil & Ghee', icon: '🪔' },
-      { id: 'spices-masala', name: 'Spices & Masala', icon: '🌶️' },
-      { id: 'dry-fruits', name: 'Dry Fruits & Nuts', icon: '🥜' },
-      { id: 'snacks-biscuits', name: 'Biscuits & Snacks', icon: '🍪' },
-      { id: 'beverages', name: 'Beverages', icon: '☕' }
-    ];
-
-    const HERO_SLIDES = [
-      {
-        id: 'slide-1',
-        badge: 'Direct Solapur Mandi Wholesale Rates',
-        title: 'Fresh Grocery Delivered To Your Doorstep',
-        image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1200'
-      }
-    ];
-
-    const MONTHLY_BUNDLES = [
-      {
-        id: 'bndl-1',
-        name: 'Small Family Ration Box (2-3 Members)',
-        price: 1499,
-        mrp: 1850,
-        items: ['Aashirvaad Atta 10KG', 'Solapur Kolam Rice 5KG', 'Toor Dal 2KG', 'Sunflower Oil 2L'],
-        tag: 'Popular'
-      },
-      {
-        id: 'bndl-2',
-        name: 'Medium Family Ration Box (4-6 Members)',
-        price: 2899,
-        mrp: 3500,
-        items: ['Aashirvaad Atta 20KG', 'Kolam Rice 10KG', 'Toor Dal 3KG', 'Ghee 1L', 'Oil 5L'],
-        tag: 'Best Value'
-      }
+      { id: 'spices', name: 'Spices & Salt', icon: '🌶️' },
+      { id: 'dry-fruits', name: 'Dry Fruits', icon: '🥜' }
     ];
 
     const MOCK_PRODUCTS = [
@@ -84,43 +55,39 @@
         price: 319,
         unit: '10 KG',
         isLoose: false,
-        image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&q=80&w=600',
-        discount: 16
+        image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&q=80&w=600'
       },
       {
         id: 'prod-102',
-        name: 'Premium Solapur Kolam Rice (Loose)',
+        name: 'Solapur Special Kolam Rice',
         brand: 'Huma Direct',
         mrp: 75,
         price: 62,
         unit: '1 KG',
         isLoose: true,
-        looseOptions: [0.5, 1, 2, 5, 10],
-        image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80&w=600',
-        discount: 17
+        looseOptions: [1, 2, 5, 10],
+        image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80&w=600'
       },
       {
         id: 'prod-103',
-        name: 'Fortune Sunlite Refined Sunflower Oil',
+        name: 'Fortune Refined Sunflower Oil',
         brand: 'Fortune',
         mrp: 175,
         price: 139,
         unit: '1 L',
         isLoose: false,
-        image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&q=80&w=600',
-        discount: 20
+        image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&q=80&w=600'
       },
       {
         id: 'prod-104',
-        name: 'Unpolished Toor Dal / Arhar Dal (Loose)',
+        name: 'Unpolished Toor Dal',
         brand: 'Tata Sampann',
         mrp: 160,
         price: 135,
         unit: '1 KG',
         isLoose: true,
         looseOptions: [0.5, 1, 2, 5],
-        image: 'https://images.unsplash.com/photo-1515543237350-b3eea1ec8082?auto=format&fit=crop&q=80&w=600',
-        discount: 15
+        image: 'https://images.unsplash.com/photo-1515543237350-b3eea1ec8082?auto=format&fit=crop&q=80&w=600'
       }
     ];
 
@@ -129,15 +96,21 @@
     const AppProvider = ({ children }) => {
       const [currentRoute, setCurrentRoute] = useState('home');
       const [cart, setCart] = useState([]);
-      const [wishlist, setWishlist] = useState(['prod-102']);
+      const [wishlist, setWishlist] = useState([]);
       const [searchQuery, setSearchQuery] = useState('');
-      const [humaCoins, setHumaCoins] = useState(120);
-      const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
-      const [isListModalOpen, setIsListModalOpen] = useState(false);
-      const [pastedListText, setPastedListText] = useState('');
-      const [deliverySlot, setDeliverySlot] = useState('express');
-      const [isScratchCardOpen, setIsScratchCardOpen] = useState(false);
-      const [scratchedDiscount, setScratchedDiscount] = useState(0);
+      const [selectedCategory, setSelectedCategory] = useState('all');
+      
+      // Order Management State
+      const [orders, setOrders] = useState([
+        {
+          id: 'HT-8821',
+          date: 'Today, 2:30 PM',
+          status: 'Out for Delivery',
+          total: 454,
+          items: [{ name: 'Aashirvaad Chakki Atta (10 KG)', qty: 1, price: 319 }, { name: 'Toor Dal (1 KG)', qty: 1, price: 135 }],
+          address: 'Main Road, Solapur'
+        }
+      ]);
 
       const navigateTo = (route) => {
         setCurrentRoute(route);
@@ -156,24 +129,9 @@
             ...product,
             quantity: 1,
             selectedLooseQty: product.isLoose ? looseQty : 1,
-            effectivePrice: product.isLoose ? product.price * looseQty : product.price,
-            effectiveMrp: product.isLoose ? product.mrp * looseQty : product.mrp
+            effectivePrice: product.isLoose ? product.price * looseQty : product.price
           }];
         });
-      };
-
-      const addBundleToCart = (bundle) => {
-        MOCK_PRODUCTS.slice(0, 2).forEach(prod => addToCart(prod));
-        setHumaCoins(prev => prev + 50);
-        navigateTo('cart');
-      };
-
-      const processPastedList = () => {
-        if (!pastedListText.trim()) return;
-        MOCK_PRODUCTS.slice(0, 2).forEach(p => addToCart(p));
-        setIsListModalOpen(false);
-        setPastedListText('');
-        navigateTo('cart');
       };
 
       const updateCartQty = (cartItemIndex, newQty) => {
@@ -192,17 +150,65 @@
         setWishlist(prev => prev.includes(productId) ? prev.filter(id => id !== productId) : [...prev, productId]);
       };
 
+      const placeOrder = (customerDetails) => {
+        if (cart.length === 0) return;
+
+        const newOrderId = 'HT-' + Math.floor(1000 + Math.random() * 9000);
+        const subtotal = cart.reduce((sum, item) => sum + (item.effectivePrice * item.quantity), 0);
+        const deliveryCharge = subtotal >= 499 ? 0 : 30;
+        const grandTotal = subtotal + deliveryCharge;
+
+        const newOrder = {
+          id: newOrderId,
+          date: 'Just Now',
+          status: 'Order Placed',
+          total: grandTotal,
+          items: cart.map(i => ({
+            name: `${i.name} (${i.isLoose ? i.selectedLooseQty + ' KG' : i.unit})`,
+            qty: i.quantity,
+            price: i.effectivePrice * i.quantity
+          })),
+          address: customerDetails.address,
+          payment: customerDetails.paymentMethod
+        };
+
+        setOrders([newOrder, ...orders]);
+
+        // Construct WhatsApp Message Text
+        let message = `*NEW ORDER - HUMA TRADERS SOLAPUR*\n`;
+        message += `*Order ID:* ${newOrderId}\n`;
+        message += `*Customer:* ${customerDetails.name} (${customerDetails.phone})\n`;
+        message += `*Delivery Address:* ${customerDetails.address}\n`;
+        message += `*Payment:* ${customerDetails.paymentMethod}\n\n`;
+        message += `*ITEMS ORDERED:*\n`;
+        
+        cart.forEach((item, index) => {
+          message += `${index + 1}. ${item.name} (${item.isLoose ? item.selectedLooseQty + ' KG' : item.unit}) x ${item.quantity} = ₹${item.effectivePrice * item.quantity}\n`;
+        });
+
+        message += `\n*Delivery Charge:* ₹${deliveryCharge}`;
+        message += `\n*TOTAL AMOUNT:* ₹${grandTotal}\n\n`;
+        message += `Please confirm my order delivery!`;
+
+        // Clear Cart
+        setCart([]);
+
+        // Open WhatsApp
+        const encodedMsg = encodeURIComponent(message);
+        window.open(`https://wa.me/${STORE_PHONE}?text=${encodedMsg}`, '_blank');
+
+        navigateTo('orders');
+      };
+
       const cartSubtotal = useMemo(() => cart.reduce((acc, item) => acc + (item.effectivePrice * item.quantity), 0), [cart]);
-      const deliveryCharge = cartSubtotal >= 499 || cartSubtotal === 0 ? 0 : 35;
-      const grandTotal = Math.max(0, cartSubtotal - scratchedDiscount + deliveryCharge);
+      const deliveryCharge = cartSubtotal >= 499 || cartSubtotal === 0 ? 0 : 30;
+      const grandTotal = cartSubtotal + deliveryCharge;
 
       const value = {
-        currentRoute, navigateTo, cart, addToCart, addBundleToCart,
-        updateCartQty, wishlist, toggleWishlist, searchQuery, setSearchQuery,
-        cartSubtotal, deliveryCharge, grandTotal, humaCoins,
-        isVoiceModalOpen, setIsVoiceModalOpen, isListModalOpen, setIsListModalOpen,
-        pastedListText, setPastedListText, processPastedList, deliverySlot, setDeliverySlot,
-        isScratchCardOpen, setIsScratchCardOpen, scratchedDiscount, setScratchedDiscount
+        currentRoute, navigateTo, cart, addToCart, updateCartQty,
+        wishlist, toggleWishlist, searchQuery, setSearchQuery,
+        selectedCategory, setSelectedCategory,
+        orders, placeOrder, cartSubtotal, deliveryCharge, grandTotal
       };
 
       return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
@@ -210,59 +216,32 @@
 
     const useApp = () => useContext(AppContext);
 
-    const HumaLogo = () => (
-      <div className="flex items-center gap-2 cursor-pointer">
-        <div className="w-9 h-9 rounded-full border border-emerald-500 bg-white p-1 flex items-center justify-center shadow-xs shrink-0">
-          <span className="text-xl">🛒</span>
-        </div>
-        <div>
-          <span className="text-base font-black tracking-tight text-emerald-950 block leading-none">
-            HUMA <span className="text-emerald-700">CUSTOMER</span>
-          </span>
-          <span className="text-[9px] text-slate-500 font-bold tracking-wider uppercase block mt-0.5">
-            SOLAPUR ONLINE STORE
-          </span>
-        </div>
-      </div>
-    );
-
     const Header = () => {
-      const { cart, wishlist, navigateTo, searchQuery, setSearchQuery, humaCoins, setIsVoiceModalOpen, setIsListModalOpen } = useApp();
+      const { cart, navigateTo, searchQuery, setSearchQuery } = useApp();
       const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
       return (
         <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs">
-          <div className="bg-emerald-900 text-emerald-50 text-[11px] px-3 py-1.5 text-center flex items-center justify-between font-medium">
-            <span>🚚 Solapur Express Delivery | FREE above ₹499!</span>
-            <div className="flex items-center gap-1 bg-emerald-800 px-2 py-0.5 rounded-full text-[10px] font-bold text-amber-300">
-              <Icon name="award" className="w-3 h-3 text-amber-300" />
-              <span>{humaCoins} Coins</span>
-            </div>
-          </div>
-
-          <div className="max-w-7xl mx-auto px-3 py-2">
-            <div className="flex items-center justify-between gap-2">
-              <div onClick={() => navigateTo('home')}>
-                <HumaLogo />
+          <div className="max-w-md mx-auto px-4 py-3">
+            <div className="flex items-center justify-between gap-3">
+              <div onClick={() => navigateTo('home')} className="flex items-center gap-2 cursor-pointer">
+                <div className="w-9 h-9 rounded-xl bg-emerald-800 text-white flex items-center justify-center font-black text-lg shadow-xs">
+                  H
+                </div>
+                <div>
+                  <h1 className="text-sm font-black text-emerald-950 tracking-tight leading-none">HUMA CUSTOMER</h1>
+                  <p className="text-[10px] font-bold text-slate-500">Solapur Grocery Store</p>
+                </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <button onClick={() => setIsListModalOpen(true)} className="flex items-center gap-1 bg-amber-50 text-amber-900 border border-amber-200 px-2 py-1 rounded-lg text-xs font-bold">
-                  <Icon name="file-text" className="w-3.5 h-3.5 text-amber-700" />
-                  <span className="hidden sm:inline">Upload Parchi</span>
+              <div className="flex items-center gap-1.5">
+                <button onClick={() => navigateTo('orders')} className="p-2 text-slate-700 bg-slate-100 rounded-xl relative" title="Order Tracking">
+                  <Icon name="package" className="w-5 h-5 text-emerald-800" />
                 </button>
-                <button onClick={() => navigateTo('wishlist')} className="p-1.5 text-slate-700 relative">
-                  <Icon name="heart" className="w-5 h-5" />
-                  {wishlist.length > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                      {wishlist.length}
-                    </span>
-                  )}
-                </button>
-                <button onClick={() => navigateTo('cart')} className="p-1.5 text-slate-700 relative">
-                  <Icon name="shopping-bag" className="w-5 h-5" />
+                <button onClick={() => navigateTo('cart')} className="p-2 text-slate-700 bg-emerald-50 rounded-xl relative">
+                  <Icon name="shopping-bag" className="w-5 h-5 text-emerald-800" />
                   {cartCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
                       {cartCount}
                     </span>
                   )}
@@ -270,21 +249,15 @@
               </div>
             </div>
 
-            <div className="mt-2 relative flex items-center">
+            <div className="mt-2.5 relative flex items-center">
               <input
                 type="text"
                 placeholder="Search Atta, Rice, Dal, Oil..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded-full py-2 pl-9 pr-20 text-xs text-slate-800 focus:outline-none"
+                className="w-full bg-slate-100 border-none rounded-xl py-2 pl-9 pr-4 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-emerald-800 focus:bg-white transition-all outline-none"
               />
               <Icon name="search" className="w-4 h-4 text-slate-400 absolute left-3" />
-              <button onClick={() => setIsVoiceModalOpen(true)} className="absolute right-12 text-emerald-800 p-1">
-                <Icon name="mic" className="w-4 h-4" />
-              </button>
-              <button onClick={() => navigateTo('shop')} className="absolute right-1 bg-emerald-800 text-white text-xs font-bold px-3 py-1 rounded-full">
-                Search
-              </button>
             </div>
           </div>
         </header>
@@ -295,30 +268,49 @@
       const { addToCart, wishlist, toggleWishlist, cart } = useApp();
       const [selectedLooseQty, setSelectedLooseQty] = useState(1);
       const isWishlisted = wishlist.includes(product.id);
-      const cartItem = cart.find(item => item.id === product.id);
+      const cartItem = cart.find(item => item.id === product.id && (!product.isLoose || item.selectedLooseQty === selectedLooseQty));
 
       const calculatedPrice = product.isLoose ? product.price * selectedLooseQty : product.price;
 
       return (
-        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs flex flex-col justify-between relative">
-          <button onClick={() => toggleWishlist(product.id)} className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white/90 flex items-center justify-center shadow-xs">
-            <Icon name="heart" className={`w-3.5 h-3.5 ${isWishlisted ? 'fill-rose-500 text-rose-500' : 'text-slate-600'}`} />
+        <div className="bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-2xs flex flex-col justify-between relative">
+          <button onClick={() => toggleWishlist(product.id)} className="absolute top-2.5 right-2.5 z-10 w-7 h-7 rounded-full bg-white/90 backdrop-blur-xs flex items-center justify-center shadow-xs">
+            <Icon name="heart" className={`w-3.5 h-3.5 ${isWishlisted ? 'fill-rose-500 text-rose-500' : 'text-slate-400'}`} />
           </button>
 
           <div className="aspect-square w-full bg-slate-50 overflow-hidden">
             <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
           </div>
 
-          <div className="p-2 flex-1 flex flex-col justify-between">
+          <div className="p-3 flex-1 flex flex-col justify-between space-y-2">
             <div>
-              <p className="text-[9px] font-bold text-emerald-700 uppercase">{product.brand}</p>
-              <h3 className="text-xs font-bold text-slate-800 line-clamp-2">{product.name}</h3>
+              <span className="text-[9px] font-extrabold text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded-md uppercase tracking-wider">{product.brand}</span>
+              <h3 className="text-xs font-bold text-slate-900 leading-snug mt-1 line-clamp-2">{product.name}</h3>
             </div>
 
-            <div className="mt-2 flex items-center justify-between">
-              <span className="text-xs font-black text-slate-900">₹{calculatedPrice}</span>
-              <button onClick={() => addToCart(product, selectedLooseQty)} className="px-2 py-1 bg-emerald-800 text-white text-xs font-bold rounded-lg">
-                + ADD
+            {product.isLoose && (
+              <div className="flex items-center gap-1.5 bg-slate-50 p-1 rounded-lg border border-slate-100">
+                <span className="text-[10px] font-bold text-slate-500">Qty:</span>
+                <select
+                  value={selectedLooseQty}
+                  onChange={(e) => setSelectedLooseQty(Number(e.target.value))}
+                  className="bg-white border border-slate-200 text-slate-800 text-[10px] font-bold rounded px-1.5 py-0.5 outline-none"
+                >
+                  {product.looseOptions.map(qty => (
+                    <option key={qty} value={qty}>{qty} KG</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between pt-1 border-t border-slate-100">
+              <div>
+                <span className="text-sm font-black text-slate-900">₹{calculatedPrice}</span>
+                <span className="text-[10px] text-slate-400 line-through ml-1">₹{product.mrp}</span>
+              </div>
+              <button onClick={() => addToCart(product, selectedLooseQty)} className="px-3 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold rounded-xl shadow-xs active:scale-95 transition-transform flex items-center gap-1">
+                <Icon name="plus" className="w-3 h-3" />
+                <span>{cartItem ? `(${cartItem.quantity})` : 'ADD'}</span>
               </button>
             </div>
           </div>
@@ -327,39 +319,34 @@
     };
 
     const HomePage = () => {
-      const { navigateTo, addBundleToCart, setIsListModalOpen } = useApp();
+      const { navigateTo } = useApp();
 
       return (
         <div className="space-y-4 pb-20">
-          <div className="relative rounded-xl overflow-hidden bg-emerald-950 text-white p-4">
-            <span className="bg-amber-400 text-slate-950 font-bold text-[10px] px-2 py-0.5 rounded-full">Solapur Direct</span>
-            <h1 className="text-lg font-black mt-1">Fresh Grocery Delivered To Your Doorstep</h1>
-            <button onClick={() => navigateTo('shop')} className="mt-3 bg-emerald-800 text-white text-xs font-bold px-4 py-2 rounded-lg">Shop Now →</button>
-          </div>
-
-          <div className="bg-amber-50 border border-amber-200 p-3 rounded-xl flex items-center justify-between">
-            <div>
-              <h3 className="text-xs font-bold text-amber-950">Haath Se Likhi Ration Parchi Upload Karo</h3>
-              <p className="text-[10px] text-amber-800">Directly paste your list</p>
-            </div>
-            <button onClick={() => setIsListModalOpen(true)} className="bg-amber-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg">Upload</button>
+          <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-emerald-900 to-emerald-800 text-white p-5 shadow-md">
+            <span className="bg-amber-400 text-slate-950 font-black text-[9px] px-2.5 py-1 rounded-full uppercase tracking-wider">Solapur Direct Mandi</span>
+            <h2 className="text-lg font-black leading-tight mt-2">Fresh Grocery Delivered To Your Doorstep</h2>
+            <p className="text-xs text-emerald-100 mt-1">Wholesale Mandi Rates Guaranteed in Solapur City!</p>
+            <button onClick={() => navigateTo('shop')} className="mt-3 bg-white text-emerald-900 text-xs font-black px-4 py-2 rounded-xl shadow-xs">
+              Explore Store →
+            </button>
           </div>
 
           <section className="space-y-2">
-            <h2 className="text-sm font-bold text-slate-900">Categories</h2>
-            <div className="flex gap-2 overflow-x-auto pb-1">
+            <h2 className="text-xs font-black text-slate-900 uppercase tracking-wider">Categories</h2>
+            <div className="flex gap-2.5 overflow-x-auto pb-1 no-scrollbar">
               {CATEGORIES_DATA.map(cat => (
-                <div key={cat.id} onClick={() => navigateTo('shop')} className="shrink-0 p-2 w-20 bg-white border rounded-xl text-center cursor-pointer">
-                  <span className="text-xl">{cat.icon}</span>
-                  <p className="text-[10px] font-bold text-slate-800 mt-0.5">{cat.name}</p>
+                <div key={cat.id} onClick={() => navigateTo('shop')} className="shrink-0 p-3 w-20 bg-white border border-slate-200 rounded-2xl text-center cursor-pointer shadow-2xs">
+                  <span className="text-2xl">{cat.icon}</span>
+                  <p className="text-[10px] font-bold text-slate-800 mt-1 truncate">{cat.name}</p>
                 </div>
               ))}
             </div>
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-sm font-bold text-slate-900">Featured Products</h2>
-            <div className="grid grid-cols-2 gap-2">
+            <h2 className="text-xs font-black text-slate-900 uppercase tracking-wider">Featured Items</h2>
+            <div className="grid grid-cols-2 gap-3">
               {MOCK_PRODUCTS.map(product => <ProductCard key={product.id} product={product} />)}
             </div>
           </section>
@@ -368,32 +355,161 @@
     };
 
     const CartPage = () => {
-      const { cart, updateCartQty, grandTotal, setIsScratchCardOpen, scratchedDiscount } = useApp();
+      const { cart, updateCartQty, cartSubtotal, deliveryCharge, grandTotal, placeOrder } = useApp();
+      const [name, setName] = useState('');
+      const [phone, setPhone] = useState('');
+      const [address, setAddress] = useState('');
+      const [paymentMethod, setPaymentMethod] = useState('Cash on Delivery');
+
+      const handleCheckout = (e) => {
+        e.preventDefault();
+        if (!name || !phone || !address) {
+          alert("Please fill your Name, Phone Number, and Delivery Address.");
+          return;
+        }
+        placeOrder({ name, phone, address, paymentMethod });
+      };
 
       return (
-        <div className="space-y-3 pb-20">
-          <h1 className="text-sm font-bold text-slate-900">Your Cart</h1>
+        <div className="space-y-4 pb-20">
+          <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">Your Cart</h2>
+
           {cart.length === 0 ? (
-            <div className="bg-white p-6 rounded-xl border text-center text-xs text-slate-500">Cart is empty.</div>
+            <div className="bg-white p-8 rounded-2xl border border-slate-200 text-center space-y-2">
+              <Icon name="shopping-bag" className="w-10 h-10 text-slate-300 mx-auto" />
+              <p className="text-xs font-bold text-slate-500">Your cart is currently empty.</p>
+            </div>
           ) : (
-            <div className="space-y-2">
-              {cart.map((item, idx) => (
-                <div key={idx} className="bg-white p-2.5 rounded-xl border flex justify-between items-center text-xs">
-                  <div>
-                    <p className="font-bold text-slate-800">{item.name}</p>
-                    <p className="text-slate-500">₹{item.effectivePrice} x {item.quantity}</p>
+            <div className="space-y-4">
+              <div className="bg-white rounded-2xl border border-slate-200 divide-y divide-slate-100 overflow-hidden shadow-2xs">
+                {cart.map((item, idx) => (
+                  <div key={idx} className="p-3 flex items-center justify-between gap-3 text-xs">
+                    <div className="flex items-center gap-3">
+                      <img src={item.image} className="w-12 h-12 rounded-xl object-cover bg-slate-50" />
+                      <div>
+                        <p className="font-bold text-slate-900">{item.name}</p>
+                        <p className="text-[10px] font-semibold text-slate-500">
+                          ₹{item.effectivePrice} x {item.quantity} ({item.isLoose ? `${item.selectedLooseQty} KG` : item.unit})
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
+                      <button onClick={() => updateCartQty(idx, item.quantity - 1)} className="w-6 h-6 bg-white font-bold rounded-lg text-slate-800 shadow-2xs">-</button>
+                      <span className="font-bold text-xs px-1">{item.quantity}</span>
+                      <button onClick={() => updateCartQty(idx, item.quantity + 1)} className="w-6 h-6 bg-white font-bold rounded-lg text-slate-800 shadow-2xs">+</button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <button onClick={() => updateCartQty(idx, item.quantity - 1)} className="w-5 h-5 bg-slate-100 font-bold rounded">-</button>
-                    <span>{item.quantity}</span>
-                    <button onClick={() => updateCartQty(idx, item.quantity + 1)} className="w-5 h-5 bg-slate-100 font-bold rounded">+</button>
+                ))}
+              </div>
+
+              {/* Delivery Details Form */}
+              <form onSubmit={handleCheckout} className="bg-white p-4 rounded-2xl border border-slate-200 space-y-3 shadow-2xs">
+                <h3 className="text-xs font-black text-slate-900 uppercase">Delivery Address & Checkout</h3>
+                
+                <input
+                  type="text"
+                  placeholder="Full Name *"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-medium focus:bg-white outline-none"
+                  required
+                />
+                <input
+                  type="tel"
+                  placeholder="Mobile / WhatsApp Number *"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-medium focus:bg-white outline-none"
+                  required
+                />
+                <textarea
+                  rows={2}
+                  placeholder="Full Delivery Address in Solapur *"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-medium focus:bg-white outline-none"
+                  required
+                />
+
+                <div className="space-y-1">
+                  <p className="text-[10px] font-bold text-slate-500 uppercase">Payment Method</p>
+                  <select
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs font-bold text-slate-800 outline-none"
+                  >
+                    <option value="Cash on Delivery">Cash on Delivery (COD)</option>
+                    <option value="UPI / PhonePe on Delivery">UPI / PhonePe on Delivery</option>
+                  </select>
+                </div>
+
+                <div className="border-t border-slate-100 pt-3 space-y-1.5 text-xs">
+                  <div className="flex justify-between text-slate-600">
+                    <span>Items Subtotal:</span>
+                    <span>₹{cartSubtotal}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-600">
+                    <span>Delivery Fee:</span>
+                    <span>{deliveryCharge === 0 ? <strong className="text-emerald-700">FREE</strong> : `₹${deliveryCharge}`}</span>
+                  </div>
+                  <div className="flex justify-between font-black text-sm text-slate-900 pt-2 border-t">
+                    <span>Total Amount:</span>
+                    <span className="text-emerald-800">₹{grandTotal}</span>
+                  </div>
+                </div>
+
+                <button type="submit" className="w-full bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold py-3 rounded-xl shadow-md flex items-center justify-center gap-2">
+                  <Icon name="send" className="w-4 h-4" />
+                  <span>Confirm & Place Order via WhatsApp</span>
+                </button>
+              </form>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    const OrdersPage = () => {
+      const { orders } = useApp();
+
+      return (
+        <div className="space-y-4 pb-20">
+          <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">Your Order Tracking</h2>
+
+          {orders.length === 0 ? (
+            <div className="bg-white p-8 rounded-2xl border border-slate-200 text-center space-y-1">
+              <Icon name="package" className="w-8 h-8 text-slate-300 mx-auto" />
+              <p className="text-xs font-bold text-slate-500">No active or past orders found.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {orders.map(order => (
+                <div key={order.id} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
+                  <div className="flex justify-between items-start border-b border-slate-100 pb-2">
+                    <div>
+                      <span className="text-xs font-black text-slate-900">{order.id}</span>
+                      <p className="text-[10px] text-slate-500 font-medium">{order.date}</p>
+                    </div>
+                    <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      ● {order.status}
+                    </span>
+                  </div>
+
+                  <div className="space-y-1 text-xs">
+                    {order.items.map((it, idx) => (
+                      <div key={idx} className="flex justify-between text-slate-700">
+                        <span>{it.name} x {it.qty}</span>
+                        <span className="font-bold">₹{it.price}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="border-t border-slate-100 pt-2 flex justify-between items-center text-xs">
+                    <span className="text-slate-500">Total: <strong className="text-slate-900">₹{order.total}</strong></span>
+                    <span className="text-[10px] text-emerald-800 font-bold bg-emerald-50 px-2 py-1 rounded-md">Live Solapur Tracking</span>
                   </div>
                 </div>
               ))}
-              <div className="bg-white p-3 rounded-xl border flex justify-between items-center font-bold text-sm">
-                <span>Grand Total:</span>
-                <span className="text-emerald-800">₹{grandTotal}</span>
-              </div>
             </div>
           )}
         </div>
@@ -401,32 +517,32 @@
     };
 
     const BottomNav = () => {
-      const { currentRoute, navigateTo, cart } = useApp();
+      const { currentRoute, navigateTo, cart, orders } = useApp();
       const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
       return (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40">
-          <div className="grid grid-cols-4 h-12">
-            <button onClick={() => navigateTo('home')} className={`flex flex-col items-center justify-center ${currentRoute === 'home' ? 'text-emerald-800 font-bold' : 'text-slate-600'}`}>
-              <Icon name="home" className="w-4 h-4" />
-              <span className="text-[10px]">Home</span>
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40 max-w-md mx-auto shadow-lg">
+          <div className="grid grid-cols-4 h-14">
+            <button onClick={() => navigateTo('home')} className={`flex flex-col items-center justify-center ${currentRoute === 'home' ? 'text-emerald-800 font-bold' : 'text-slate-500'}`}>
+              <Icon name="home" className="w-5 h-5" />
+              <span className="text-[10px] mt-0.5">Home</span>
             </button>
-            <button onClick={() => navigateTo('shop')} className={`flex flex-col items-center justify-center ${currentRoute === 'shop' ? 'text-emerald-800 font-bold' : 'text-slate-600'}`}>
-              <Icon name="shopping-bag" className="w-4 h-4" />
-              <span className="text-[10px]">Shop</span>
+            <button onClick={() => navigateTo('shop')} className={`flex flex-col items-center justify-center ${currentRoute === 'shop' ? 'text-emerald-800 font-bold' : 'text-slate-500'}`}>
+              <Icon name="grid" className="w-5 h-5" />
+              <span className="text-[10px] mt-0.5">Shop</span>
             </button>
-            <button onClick={() => navigateTo('wishlist')} className={`flex flex-col items-center justify-center ${currentRoute === 'wishlist' ? 'text-emerald-800 font-bold' : 'text-slate-600'}`}>
-              <Icon name="heart" className="w-4 h-4" />
-              <span className="text-[10px]">Wishlist</span>
+            <button onClick={() => navigateTo('orders')} className={`flex flex-col items-center justify-center relative ${currentRoute === 'orders' ? 'text-emerald-800 font-bold' : 'text-slate-500'}`}>
+              <Icon name="package" className="w-5 h-5" />
+              <span className="text-[10px] mt-0.5">Orders</span>
             </button>
-            <button onClick={() => navigateTo('cart')} className={`flex flex-col items-center justify-center relative ${currentRoute === 'cart' ? 'text-emerald-800 font-bold' : 'text-slate-600'}`}>
-              <Icon name="shopping-bag" className="w-4 h-4" />
+            <button onClick={() => navigateTo('cart')} className={`flex flex-col items-center justify-center relative ${currentRoute === 'cart' ? 'text-emerald-800 font-bold' : 'text-slate-500'}`}>
+              <Icon name="shopping-bag" className="w-5 h-5" />
               {cartCount > 0 && (
-                <span className="absolute top-1 right-6 bg-rose-500 text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                <span className="absolute top-1.5 right-6 bg-rose-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                   {cartCount}
                 </span>
               )}
-              <span className="text-[10px]">Cart</span>
+              <span className="text-[10px] mt-0.5">Cart</span>
             </button>
           </div>
         </div>
@@ -436,17 +552,17 @@
     const App = () => {
       const { currentRoute } = useApp();
       return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-slate-100 max-w-md mx-auto shadow-xl relative">
           <Header />
-          <main className="max-w-7xl mx-auto px-3 py-3">
+          <main className="px-4 py-3">
             {currentRoute === 'home' && <HomePage />}
             {currentRoute === 'shop' && (
-              <div className="grid grid-cols-2 gap-2 pb-20">
+              <div className="grid grid-cols-2 gap-3 pb-20">
                 {MOCK_PRODUCTS.map(product => <ProductCard key={product.id} product={product} />)}
               </div>
             )}
             {currentRoute === 'cart' && <CartPage />}
-            {currentRoute === 'wishlist' && <div className="text-xs text-slate-500 text-center py-6">Wishlist items here</div>}
+            {currentRoute === 'orders' && <OrdersPage />}
           </main>
           <BottomNav />
         </div>
