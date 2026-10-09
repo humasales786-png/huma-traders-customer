@@ -3,15 +3,36 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Huma Traders - Online Grocery Shop</title>
+    <title>Huma Traders - Online Kirana Store Solapur</title>
+    
+    <!-- PWA Web App Manifest -->
+    <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Huma%20Traders%20Store%22%2C%22short_name%22%3A%22HumaTraders%22%2C%22start_url%22%3A%22%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23065f46%22%2C%22theme_color%22%3A%22%23065f46%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F3144%2F3144456.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%22%7D%5D%7D" />
+    <meta name="theme-color" content="#065f46" />
+    
+    <!-- CDNs -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   </head>
-  <body>
+  <body class="bg-gray-50 text-gray-800">
     <div id="root"></div>
 
+    <!-- Inline Service Worker for PWA -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        const swCode = `
+          self.addEventListener('install', (e) => self.skipWaiting());
+          self.addEventListener('activate', (e) => e.waitUntil(clients.claim()));
+          self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request).catch(() => new Response('Offline'))));
+        `;
+        const blob = new Blob([swCode], { type: 'application/javascript' });
+        const swUrl = URL.createObjectURL(blob);
+        navigator.serviceWorker.register(swUrl).catch(() => {});
+      }
+    </script>
+
+    <!-- React App Code -->
     <script type="text/babel">
       const { useState } = React;
 
@@ -20,7 +41,7 @@
           { id: 1, name: 'Toor Dal (Premium)', price: 135, unit: 'kg', image: '🌾' },
           { id: 2, name: 'Sugar / Sakhar', price: 42, unit: 'kg', image: '🍬' },
           { id: 3, name: 'Groundnut Oil (15L)', price: 2450, unit: 'tin', image: '🛢️' },
-          { id: 4, name: 'Lokwan Wheat', price: 38, unit: 'kg', stock: 1200, image: '🌾' }
+          { id: 4, name: 'Lokwan Wheat', price: 38, unit: 'kg', image: '🌾' }
         ]);
 
         const [cart, setCart] = useState([]);
